@@ -1,0 +1,13 @@
+{
+  "DetailedErrors": true,
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "PatientContextDb": "Data Source=(localdb)\\ProjectsV13;Initial Catalog=BreastCancerDb;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=true;"
+  }
+}
