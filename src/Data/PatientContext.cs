@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BreastCancerAPI.Models;
 
 namespace BreastCancerAPI.Data
 {
@@ -43,5 +44,8 @@ namespace BreastCancerAPI.Data
             //        OrderNumber = "12345"
             //    });
         }
+
+        // Add initial data(seeding) to the database
+        public DbSet<BreastCancerAPI.Models.PatientModel> PatientModel { get; set; }
     }
 }

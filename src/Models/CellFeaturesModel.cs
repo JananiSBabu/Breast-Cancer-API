@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BreastCancerAPI.Data.Entities
+namespace BreastCancerAPI.Models
 {
-    public class CellFeatures
-    {        
+    public class CellFeaturesModel
+    {
         public int Id { get; set; }
         public double Radius { get; set; }
         public double Texture { get; set; }
@@ -18,8 +18,5 @@ namespace BreastCancerAPI.Data.Entities
         public double ConcavePoints { get; set; }
         public double Symmetry { get; set; }
         public double FractalDimension { get; set; }
-        public int MitosisCount { get; set; }
-
-        public int NucleiSize { get; set; }
     }
 }

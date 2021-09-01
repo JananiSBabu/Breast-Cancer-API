@@ -1,11 +1,12 @@
-﻿using System;
+﻿using BreastCancerAPI.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BreastCancerAPI.Data.Entities
+namespace BreastCancerAPI.Models
 {
-    public class PrognosticInfo
+    public class PrognosticInfoModel
     {
         public int Id { get; set; }
         // values = R or N
@@ -15,8 +16,5 @@ namespace BreastCancerAPI.Data.Entities
         public int? LymphNodeStatus { get; set; }
         public CellFeatures CellFeatures { get; set; }
         public Patient Patient { get; set; }
-        public string TumorGrade { get; set; }
-        public string TumorType { get; set; }
-        public string HER2Status { get; set; }
     }
 }

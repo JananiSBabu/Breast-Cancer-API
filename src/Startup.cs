@@ -30,6 +30,10 @@ namespace BreastCancerAPI
             // Register the PatientSeeder service for Dependency Injection
             services.AddTransient<PatientSeeder>();
 
+            // Adds scoped Service IPatientRepository with implementation in PatientRepository
+            services.AddScoped<IPatientRepository, PatientRepository>();
+
+            // For circular reference within entities: ReferenceLoopHandling.Ignore
             services.AddControllers()
                 .AddNewtonsoftJson(cfg
                 => cfg.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -59,7 +63,8 @@ namespace BreastCancerAPI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                //endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }
