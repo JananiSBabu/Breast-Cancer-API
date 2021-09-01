@@ -9,6 +9,7 @@ using BreastCancerAPI.Data;
 using BreastCancerAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Routing;
+using BreastCancerAPI.Data.Entities;
 
 namespace BreastCancerAPI.Controllers
 {
@@ -51,17 +52,30 @@ namespace BreastCancerAPI.Controllers
         }
 
         // GET: api/Patients/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PatientModel>> GetPatient(int id)
+        [HttpGet("{mrn}")]
+        public async Task<ActionResult<PatientModel>> GetPatient(int mrn, bool includePrognosticInfos = false)
         {
-            var patientModel = await _context.PatientModel.FindAsync(id);
-
-            if (patientModel == null)
+            try
             {
-                return NotFound();
-            }
+                // results are "entities" themselves -> Patient
+                var result = await _repository.GetPatientByMRNAsync(mrn, includePrognosticInfos);
 
-            return patientModel;
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                // map a model to the entities
+                // here AM returns a single model 
+                PatientModel model = _mapper.Map<PatientModel>(result);
+
+                return model;
+
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
         }
 
         // PUT: api/Patients/5
@@ -98,12 +112,49 @@ namespace BreastCancerAPI.Controllers
         // POST: api/Patients
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PatientModel>> PostPatient(PatientModel patientModel)
+        public async Task<ActionResult<PatientModel>> PostPatient(PatientModel patientModel, bool includePrognosticInfos = false)
         {
-            _context.PatientModel.Add(patientModel);
-            await _context.SaveChangesAsync();
+            // In Post, get input as PatientModel and save it as "Patient".[Reverse of Get]
 
-            return CreatedAtAction("GetPatientModel", new { id = patientModel.Id }, patientModel);
+            // Validate the uniqueness of the moniker
+            var existing = await _repository.GetPatientByMRNAsync(patientModel.MRN, includePrognosticInfos);
+            if (existing != null)
+            {
+                return BadRequest("MRN is already existing");
+            }
+
+            try
+            {
+                var s1 = new { mrn = patientModel.MRN };
+
+                // Create the URI to be returned using linkgenerator
+                var location = _linkGenerator.GetPathByAction("Get",
+                   "Patients", values: new { mrn = patientModel.MRN });
+
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    //// Hardcoding the string of URI - susceptible to change 
+                    location = $"/api/camps/{patientModel.MRN}";
+                }
+
+                // Create entity from Model
+                Patient patient = _mapper.Map<Patient>(patientModel);
+
+                _repository.Add(patient);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    //return the URI and the created object (map back to campModel)
+                    return Created(location, _mapper.Map<PatientModel>(patient));
+                }
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
+
+            // If Save changes failed
+            return BadRequest();
         }
 
         // DELETE: api/Patients/5

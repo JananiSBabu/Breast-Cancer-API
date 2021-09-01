@@ -1,0 +1,21 @@
+
+http://localhost:45178/api/patients
+http://localhost:45178/api/patients/?includePrognosticInfos=true
+
+http://localhost:45178/api/patients/119513
+http://localhost:45178/api/patients/119513/?includePrognosticInfos=true
+
+POST:
+http://localhost:45178/api/patients/
+{
+    "mrn": 10002,
+    "prognosticInfos": [
+        {
+            "outcome": "N",
+            "time": 62,
+            "tumorSize": 5.0,
+            "lymphNodeStatus": 5
+        }
+    ]
+}
+get: http://localhost:45178/api/patients/10002/?includePrognosticInfos=true
