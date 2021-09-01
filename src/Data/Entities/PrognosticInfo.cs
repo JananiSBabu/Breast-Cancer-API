@@ -14,9 +14,9 @@ namespace BreastCancerAPI.Data.Entities
 
         public int Time { get; set; }
 
-        public float TumorSize { get; set; }
+        public double TumorSize { get; set; }
 
-        public int LymphNodeStatus { get; set; }
+        public int? LymphNodeStatus { get; set; }
 
         public CellFeatures CellFeatures { get; set; }
 

@@ -33,7 +33,8 @@ namespace BreastCancerAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MRN = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,8 +49,8 @@ namespace BreastCancerAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Outcome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Time = table.Column<int>(type: "int", nullable: false),
-                    TumorSize = table.Column<float>(type: "real", nullable: false),
-                    LymphNodeStatus = table.Column<int>(type: "int", nullable: false),
+                    TumorSize = table.Column<double>(type: "float", nullable: false),
+                    LymphNodeStatus = table.Column<int>(type: "int", nullable: true),
                     CellFeaturesId = table.Column<int>(type: "int", nullable: true),
                     PatientId = table.Column<int>(type: "int", nullable: true)
                 },

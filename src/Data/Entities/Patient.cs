@@ -9,7 +9,8 @@ namespace BreastCancerAPI.Data.Entities
     {
         public int Id { get; set; }
 
-        public ICollection<PrognosticInfo> PrognosticInfos { get; set; }
+        public int MRN { get; set; }
+        public List<PrognosticInfo> PrognosticInfos { get; set; }
 
         //public CellFeatures CellFeatures { get; set; }
 

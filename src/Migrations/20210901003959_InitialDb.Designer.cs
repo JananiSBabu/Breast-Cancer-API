@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BreastCancerAPI.Migrations
 {
     [DbContext(typeof(PatientContext))]
-    [Migration("20210831225353_InitialDb")]
+    [Migration("20210901003959_InitialDb")]
     partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,9 @@ namespace BreastCancerAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("MRN")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Patients");
@@ -85,7 +88,7 @@ namespace BreastCancerAPI.Migrations
                     b.Property<int?>("CellFeaturesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("LymphNodeStatus")
+                    b.Property<int?>("LymphNodeStatus")
                         .HasColumnType("int");
 
                     b.Property<string>("Outcome")
@@ -97,8 +100,8 @@ namespace BreastCancerAPI.Migrations
                     b.Property<int>("Time")
                         .HasColumnType("int");
 
-                    b.Property<float>("TumorSize")
-                        .HasColumnType("real");
+                    b.Property<double>("TumorSize")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
