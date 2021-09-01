@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Reflection;
 
 namespace BreastCancerAPI
 {
@@ -26,6 +27,9 @@ namespace BreastCancerAPI
             {
                 cfg.UseSqlServer(Configuration.GetConnectionString("PatientContextDb"));
             });
+
+            // add automapper to look for the profiles in the current assembly
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             // Register the PatientSeeder service for Dependency Injection
             services.AddTransient<PatientSeeder>();

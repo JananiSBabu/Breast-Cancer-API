@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BreastCancerAPI.Data;
 using BreastCancerAPI.Models;
+using AutoMapper;
+using Microsoft.AspNetCore.Routing;
 
 namespace BreastCancerAPI.Controllers
 {
@@ -14,18 +16,38 @@ namespace BreastCancerAPI.Controllers
     [ApiController]
     public class PatientsController : ControllerBase
     {
-        private readonly PatientContext _context;
+        private PatientContext _context; // To be deleted
+        private IPatientRepository _repository;
+        private IMapper _mapper;
+        private LinkGenerator _linkGenerator;
 
-        public PatientsController(PatientContext context)
+        public PatientsController(PatientContext context,
+            IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
-            _context = context;
+            _repository = repository;
+            _mapper = mapper;
+            _linkGenerator = linkGenerator;
         }
 
         // GET: api/Patients
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PatientModel>>> GetPatients()
+        public async Task<ActionResult<IEnumerable<PatientModel>>> GetPatients(bool includePrognosticInfos = false)
         {
-            return await _context.PatientModel.ToListAsync();
+            try
+            {
+                // results are "entities" themselves -> Patient
+                var results = await _repository.GetAllPatientsAsync(includePrognosticInfos);
+
+                // map a model to the entities
+                // here AM returns list of PatientModels
+                PatientModel[] models = _mapper.Map<PatientModel[]>(results);
+
+                return models;
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
         }
 
         // GET: api/Patients/5

@@ -41,6 +41,12 @@ namespace BreastCancerAPI.Migrations
                     b.Property<double>("FractalDimension")
                         .HasColumnType("float");
 
+                    b.Property<int>("MitosisCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NucleiSize")
+                        .HasColumnType("int");
+
                     b.Property<double>("Perimeter")
                         .HasColumnType("float");
 
@@ -68,8 +74,17 @@ namespace BreastCancerAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("MRN")
                         .HasColumnType("int");
+
+                    b.Property<string>("PrimaryPhysician")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -86,6 +101,9 @@ namespace BreastCancerAPI.Migrations
                     b.Property<int?>("CellFeaturesId")
                         .HasColumnType("int");
 
+                    b.Property<string>("HER2Status")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("LymphNodeStatus")
                         .HasColumnType("int");
 
@@ -95,11 +113,20 @@ namespace BreastCancerAPI.Migrations
                     b.Property<int?>("PatientId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PatientModelId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Time")
                         .HasColumnType("int");
 
+                    b.Property<string>("TumorGrade")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("TumorSize")
                         .HasColumnType("float");
+
+                    b.Property<string>("TumorType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -107,7 +134,24 @@ namespace BreastCancerAPI.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.HasIndex("PatientModelId");
+
                     b.ToTable("PrognosticInfos");
+                });
+
+            modelBuilder.Entity("BreastCancerAPI.Models.PatientModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("MRN")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PatientModel");
                 });
 
             modelBuilder.Entity("BreastCancerAPI.Data.Entities.PrognosticInfo", b =>
@@ -120,12 +164,21 @@ namespace BreastCancerAPI.Migrations
                         .WithMany("PrognosticInfos")
                         .HasForeignKey("PatientId");
 
+                    b.HasOne("BreastCancerAPI.Models.PatientModel", null)
+                        .WithMany("PrognosticInfos")
+                        .HasForeignKey("PatientModelId");
+
                     b.Navigation("CellFeatures");
 
                     b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("BreastCancerAPI.Data.Entities.Patient", b =>
+                {
+                    b.Navigation("PrognosticInfos");
+                });
+
+            modelBuilder.Entity("BreastCancerAPI.Models.PatientModel", b =>
                 {
                     b.Navigation("PrognosticInfos");
                 });

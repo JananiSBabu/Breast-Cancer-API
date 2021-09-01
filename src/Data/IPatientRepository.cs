@@ -1,21 +1,26 @@
 ﻿using BreastCancerAPI.Data.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BreastCancerAPI.Data
 {
     public interface IPatientRepository
     {
-        IEnumerable<Patient> GetAllPatients();
-        IEnumerable<PrognosticInfo> GetAllPrognosticInfo();
+        // General 
+        void Add<T>(T entity) where T : class;
+        void Delete<T>(T entity) where T : class;
+        Task<bool> SaveChangesAsync();
 
-        IEnumerable<PrognosticInfo> GetAllPrognosticInfoByPatientId(int patient);
+        // Patient
+        Task<Patient[]> GetAllPatientsAsync(bool includePrognosticInfos = false);
 
-        IEnumerable<PrognosticInfo> GetAllPrognosticInfoByOutcome(string category);
-        
+        // PrognosticInfo
+        Task<PrognosticInfo[]> GetAllPrognosticInfoAsync();
+        Task<PrognosticInfo[]> GetAllPrognosticInfoByPatientId(int patient);
+        Task<PrognosticInfo[]> GetAllPrognosticInfoByOutcome(string category);
 
-        IEnumerable<CellFeatures> GetAllCellFeatures();
-        void AddEntity(object model);
+        // CellFeatures
+        Task<CellFeatures[]> GetAllCellFeaturesAsync();
 
-        bool SaveAll();
     }
 }

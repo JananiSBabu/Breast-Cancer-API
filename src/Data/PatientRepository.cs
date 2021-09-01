@@ -1,4 +1,6 @@
 ﻿using BreastCancerAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,45 +11,64 @@ namespace BreastCancerAPI.Data
     public class PatientRepository : IPatientRepository
     {
         private readonly PatientContext _ctx;
+        private readonly ILogger<PatientRepository> _logger;
 
-        public PatientRepository(PatientContext ctx)
+        public PatientRepository(PatientContext ctx, ILogger<PatientRepository> logger)
         {
             _ctx = ctx;
+            _logger = logger;
         }
 
-        public IEnumerable<Patient> GetAllPatients()
+        public async Task<Patient[]> GetAllPatientsAsync(bool includePrognosticInfos = false)
         {
-            return _ctx.Patients
-                        .OrderBy(p => p.MRN)
-                        .ToList();
+            _logger.LogInformation($"Getting all Patients");
+
+            IQueryable<Patient> query = _ctx.Patients;
+
+            if (includePrognosticInfos)
+            {
+                query = query
+                  .Include(c => c.PrognosticInfos)
+                  .ThenInclude(t => t.CellFeatures);
+            }
+
+            // Order It
+            query = query.OrderByDescending(c => c.MRN);
+
+            return await query.ToArrayAsync();
         }
 
-        void IPatientRepository.AddEntity(object model)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<CellFeatures> IPatientRepository.GetAllCellFeatures()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<PrognosticInfo> IPatientRepository.GetAllPrognosticInfo()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerable<PrognosticInfo> IPatientRepository.GetAllPrognosticInfoByOutcome(string category)
+        void IPatientRepository.Add<T>(T entity)
         {
             throw new NotImplementedException();
         }
 
-        IEnumerable<PrognosticInfo> IPatientRepository.GetAllPrognosticInfoByPatientId(int patient)
+        void IPatientRepository.Delete<T>(T entity)
         {
             throw new NotImplementedException();
         }
 
-        bool IPatientRepository.SaveAll()
+        Task<CellFeatures[]> IPatientRepository.GetAllCellFeaturesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoByOutcome(string category)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoByPatientId(int patient)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IPatientRepository.SaveChangesAsync()
         {
             throw new NotImplementedException();
         }

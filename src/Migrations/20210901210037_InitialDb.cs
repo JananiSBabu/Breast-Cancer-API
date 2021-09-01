@@ -21,11 +21,26 @@ namespace BreastCancerAPI.Migrations
                     Concavity = table.Column<double>(type: "float", nullable: false),
                     ConcavePoints = table.Column<double>(type: "float", nullable: false),
                     Symmetry = table.Column<double>(type: "float", nullable: false),
-                    FractalDimension = table.Column<double>(type: "float", nullable: false)
+                    FractalDimension = table.Column<double>(type: "float", nullable: false),
+                    MitosisCount = table.Column<int>(type: "int", nullable: false),
+                    NucleiSize = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CellFeatures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PatientModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MRN = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PatientModel", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,7 +49,10 @@ namespace BreastCancerAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MRN = table.Column<int>(type: "int", nullable: false)
+                    MRN = table.Column<int>(type: "int", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    PrimaryPhysician = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,7 +70,11 @@ namespace BreastCancerAPI.Migrations
                     TumorSize = table.Column<double>(type: "float", nullable: false),
                     LymphNodeStatus = table.Column<int>(type: "int", nullable: true),
                     CellFeaturesId = table.Column<int>(type: "int", nullable: true),
-                    PatientId = table.Column<int>(type: "int", nullable: true)
+                    PatientId = table.Column<int>(type: "int", nullable: true),
+                    TumorGrade = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TumorType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HER2Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PatientModelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -61,6 +83,12 @@ namespace BreastCancerAPI.Migrations
                         name: "FK_PrognosticInfos_CellFeatures_CellFeaturesId",
                         column: x => x.CellFeaturesId,
                         principalTable: "CellFeatures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PrognosticInfos_PatientModel_PatientModelId",
+                        column: x => x.PatientModelId,
+                        principalTable: "PatientModel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -80,6 +108,11 @@ namespace BreastCancerAPI.Migrations
                 name: "IX_PrognosticInfos_PatientId",
                 table: "PrognosticInfos",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrognosticInfos_PatientModelId",
+                table: "PrognosticInfos",
+                column: "PatientModelId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -89,6 +122,9 @@ namespace BreastCancerAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "CellFeatures");
+
+            migrationBuilder.DropTable(
+                name: "PatientModel");
 
             migrationBuilder.DropTable(
                 name: "Patients");
