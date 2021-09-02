@@ -1,6 +1,8 @@
 using BreastCancerAPI.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +43,20 @@ namespace BreastCancerAPI
             services.AddControllers()
                 .AddNewtonsoftJson(cfg
                 => cfg.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            // API Versioning
+            services.AddApiVersioning(opt =>
+            {
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.DefaultApiVersion = new ApiVersion(1, 0);
+                opt.ReportApiVersions = true; // Add version to headers       
+                //opt.ApiVersionReader = new UrlSegmentApiVersionReader();
+                //opt.ApiVersionReader = new QueryStringApiVersionReader("ver"); // specify version in URI
+                //opt.ApiVersionReader = new HeaderApiVersionReader("X-version");  // specify version in header
+                opt.ApiVersionReader = ApiVersionReader.Combine(
+                    new QueryStringApiVersionReader("ver", "version"),
+                    new HeaderApiVersionReader("X-version"));
+            });
 
         }
 

@@ -13,6 +13,7 @@ using BreastCancerAPI.Data.Entities;
 
 namespace BreastCancerAPI.Controllers
 {
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientsController : ControllerBase
@@ -50,7 +51,7 @@ namespace BreastCancerAPI.Controllers
         }
 
         // GET: api/Patients/199
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<PatientModel>> GetPatient(int id, bool includePrognosticInfos = false)
         {
             try
@@ -78,7 +79,7 @@ namespace BreastCancerAPI.Controllers
 
         // PUT: api/Patients/199
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult<PatientModel>> PutPatient(int id, PatientModel patientModel)
         {
             if (id != patientModel.Id)
@@ -161,7 +162,7 @@ namespace BreastCancerAPI.Controllers
         }
 
         // DELETE: api/Patients/199
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeletePatient(int id)
         {
             try

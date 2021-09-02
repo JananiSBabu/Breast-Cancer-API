@@ -13,6 +13,7 @@ using BreastCancerAPI.Data.Entities;
 
 namespace BreastCancerAPI.Controllers
 {
+    [ApiVersion("1")]
     [Route("api/patients/{patientid}/prognosticinfosforpatient")]
     [ApiController]
     public class PrognosticInfosForPatientController : ControllerBase
