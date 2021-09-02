@@ -10,6 +10,6 @@ namespace BreastCancerAPI.Models
     {
         public int Id { get; set; }
         public int MRN { get; set; }
-        public List<PrognosticInfo> PrognosticInfos { get; set; }
+        public List<PrognosticInfoModel> PrognosticInfos { get; set; }
     }
 }

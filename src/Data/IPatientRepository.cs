@@ -15,6 +15,8 @@ namespace BreastCancerAPI.Data
         Task<Patient[]> GetAllPatientsAsync(bool includePrognosticInfos = false);
         Task<Patient> GetPatientByMRNAsync(int mrn, bool includePrognosticInfos = false);
 
+        Task<Patient> GetPatientByIdAsync(int id, bool includePrognosticInfos = false);
+
         // PrognosticInfo
         Task<PrognosticInfo[]> GetAllPrognosticInfoAsync();
         Task<PrognosticInfo[]> GetAllPrognosticInfoByPatientId(int patient);

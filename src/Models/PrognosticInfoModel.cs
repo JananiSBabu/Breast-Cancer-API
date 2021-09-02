@@ -14,7 +14,6 @@ namespace BreastCancerAPI.Models
         public int Time { get; set; }
         public double TumorSize { get; set; }
         public int? LymphNodeStatus { get; set; }
-        public CellFeatures CellFeatures { get; set; }
-        public Patient Patient { get; set; }
+        public CellFeaturesModel CellFeatures { get; set; }
     }
 }

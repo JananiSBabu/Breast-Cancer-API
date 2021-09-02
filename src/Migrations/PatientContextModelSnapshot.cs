@@ -113,9 +113,6 @@ namespace BreastCancerAPI.Migrations
                     b.Property<int?>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PatientModelId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Time")
                         .HasColumnType("int");
 
@@ -134,9 +131,49 @@ namespace BreastCancerAPI.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.HasIndex("PatientModelId");
-
                     b.ToTable("PrognosticInfos");
+                });
+
+            modelBuilder.Entity("BreastCancerAPI.Models.CellFeaturesModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Area")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Compactness")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ConcavePoints")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Concavity")
+                        .HasColumnType("float");
+
+                    b.Property<double>("FractalDimension")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Perimeter")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Radius")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Smoothness")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Symmetry")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Texture")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CellFeaturesModel");
                 });
 
             modelBuilder.Entity("BreastCancerAPI.Models.PatientModel", b =>
@@ -154,6 +191,40 @@ namespace BreastCancerAPI.Migrations
                     b.ToTable("PatientModel");
                 });
 
+            modelBuilder.Entity("BreastCancerAPI.Models.PrognosticInfoModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CellFeaturesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LymphNodeStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Outcome")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PatientModelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Time")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TumorSize")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CellFeaturesId");
+
+                    b.HasIndex("PatientModelId");
+
+                    b.ToTable("PrognosticInfoModel");
+                });
+
             modelBuilder.Entity("BreastCancerAPI.Data.Entities.PrognosticInfo", b =>
                 {
                     b.HasOne("BreastCancerAPI.Data.Entities.CellFeatures", "CellFeatures")
@@ -164,13 +235,22 @@ namespace BreastCancerAPI.Migrations
                         .WithMany("PrognosticInfos")
                         .HasForeignKey("PatientId");
 
+                    b.Navigation("CellFeatures");
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("BreastCancerAPI.Models.PrognosticInfoModel", b =>
+                {
+                    b.HasOne("BreastCancerAPI.Models.CellFeaturesModel", "CellFeatures")
+                        .WithMany()
+                        .HasForeignKey("CellFeaturesId");
+
                     b.HasOne("BreastCancerAPI.Models.PatientModel", null)
                         .WithMany("PrognosticInfos")
                         .HasForeignKey("PatientModelId");
 
                     b.Navigation("CellFeatures");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("BreastCancerAPI.Data.Entities.Patient", b =>

@@ -36,6 +36,12 @@ namespace BreastCancerAPI.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Patient>()
+            .HasMany(i => i.PrognosticInfos)
+            .WithOne(c => c.Patient)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
             //builder.Entity<Order>()
             //    .HasData(new Order()
             //    {

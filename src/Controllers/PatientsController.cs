@@ -52,13 +52,13 @@ namespace BreastCancerAPI.Controllers
         }
 
         // GET: api/Patients/5
-        [HttpGet("{mrn}")]
-        public async Task<ActionResult<PatientModel>> GetPatient(int mrn, bool includePrognosticInfos = false)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PatientModel>> GetPatient(int id, bool includePrognosticInfos = false)
         {
             try
             {
                 // results are "entities" themselves -> Patient
-                var result = await _repository.GetPatientByMRNAsync(mrn, includePrognosticInfos);
+                var result = await _repository.GetPatientByIdAsync(id, includePrognosticInfos);
 
                 if (result == null)
                 {
@@ -78,9 +78,9 @@ namespace BreastCancerAPI.Controllers
             }
         }
 
-        // PUT: api/Patients/5
+        // PUT: api/Patients/10001
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{mrn}")]
         public async Task<IActionResult> PutPatient(int id, PatientModel patientModel)
         {
             if (id != patientModel.Id)
@@ -117,24 +117,22 @@ namespace BreastCancerAPI.Controllers
             // In Post, get input as PatientModel and save it as "Patient".[Reverse of Get]
 
             // Validate the uniqueness of the moniker
-            var existing = await _repository.GetPatientByMRNAsync(patientModel.MRN, includePrognosticInfos);
+            var existing = await _repository.GetPatientByIdAsync(patientModel.Id, includePrognosticInfos);
             if (existing != null)
             {
-                return BadRequest("MRN is already existing");
+                return BadRequest("Patient is already existing");
             }
 
             try
             {
-                var s1 = new { mrn = patientModel.MRN };
-
                 // Create the URI to be returned using linkgenerator
                 var location = _linkGenerator.GetPathByAction("Get",
-                   "Patients", values: new { mrn = patientModel.MRN });
+                   "Patients", values: new { id = patientModel.Id });
 
                 if (string.IsNullOrWhiteSpace(location))
                 {
                     //// Hardcoding the string of URI - susceptible to change 
-                    location = $"/api/camps/{patientModel.MRN}";
+                    location = $"/api/camps/{patientModel.Id}";
                 }
 
                 // Create entity from Model
@@ -157,20 +155,33 @@ namespace BreastCancerAPI.Controllers
             return BadRequest();
         }
 
-        // DELETE: api/Patients/5
+        // DELETE: api/Patients/10001
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatient(int id)
         {
-            var patientModel = await _context.PatientModel.FindAsync(id);
-            if (patientModel == null)
+            try
             {
-                return NotFound();
+                var patient = await _repository.GetPatientByIdAsync(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+
+                // Delete the entity if found
+                _repository.Delete(patient);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
 
-            _context.PatientModel.Remove(patientModel);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            // If Save changes failed
+            return BadRequest();
         }
 
         private bool PatientExists(int id)

@@ -80,6 +80,25 @@ namespace BreastCancerAPI.Data
             return await query.FirstOrDefaultAsync();
         }
 
+        public async Task<Patient> GetPatientByIdAsync(int id, bool includePrognosticInfos = false)
+        {
+            _logger.LogInformation($"Getting a Patient for {id}");
+
+            IQueryable<Patient> query = _ctx.Patients;
+
+            if (includePrognosticInfos)
+            {
+                query = query
+                  .Include(c => c.PrognosticInfos)
+                  .ThenInclude(t => t.CellFeatures);
+            }
+
+            // Query It
+            query = query.Where(c => c.Id == id);
+
+            return await query.FirstOrDefaultAsync();
+        }
+
         #endregion
 
         #region PrognosticInfos
