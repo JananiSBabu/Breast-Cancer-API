@@ -8,6 +8,6 @@
     }
   },
   "ConnectionStrings": {
-    "PatientContextDb": "Data Source=(localdb)\\ProjectsV13;Initial Catalog=BreastCancerDb;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=true;"
+    "PatientContextDb": "Server=tcp:breastcancerapidbserver.database.windows.net,1433;Initial Catalog=bcapi_db;Persist Security Info=False;User ID=jananibabu;Password=Asdf1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   }
 }
