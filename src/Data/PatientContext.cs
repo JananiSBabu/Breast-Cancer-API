@@ -31,24 +31,20 @@ namespace BreastCancerAPI.Data
 
         }
 
-        // Add initial data(seeding) to the database
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            // Patient -> PrognosticInfo -> Patient 
+            // Use "DeleteBehavior.Cascade": Deleting Patient will delete all the related PrognosticInfo 
+            //https://docs.microsoft.com/en-us/ef/core/saving/cascade-delete#configuring-cascading-behaviors 
             builder.Entity<Patient>()
             .HasMany(i => i.PrognosticInfos)
             .WithOne(c => c.Patient)
             .OnDelete(DeleteBehavior.Cascade);
 
-
-            //builder.Entity<Order>()
-            //    .HasData(new Order()
-            //    {
-            //        Id = 1,
-            //        OrderDate = System.DateTime.UtcNow,
-            //        OrderNumber = "12345"
-            //    });
+            // Add simple initial data(seeding) to the database, if needed
         }
 
         // Add initial data(seeding) to the database

@@ -2,8 +2,8 @@
 http://localhost:45178/api/patients
 http://localhost:45178/api/patients/?includePrognosticInfos=true
 
-http://localhost:45178/api/patients/119513
-http://localhost:45178/api/patients/119513/?includePrognosticInfos=true
+http://localhost:45178/api/patients/15
+http://localhost:45178/api/patients/15/?includePrognosticInfos=true
 
 POST:
 http://localhost:45178/api/patients/
@@ -18,4 +18,9 @@ http://localhost:45178/api/patients/
         }
     ]
 }
-get: http://localhost:45178/api/patients/10002/?includePrognosticInfos=true
+get: http://localhost:45178/api/patients/199/?includePrognosticInfos=true
+
+
+DELETE:
+
+http://localhost:45178/api/patients/16/

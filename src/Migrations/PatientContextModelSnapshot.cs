@@ -233,7 +233,8 @@ namespace BreastCancerAPI.Migrations
 
                     b.HasOne("BreastCancerAPI.Data.Entities.Patient", "Patient")
                         .WithMany("PrognosticInfos")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("CellFeatures");
 

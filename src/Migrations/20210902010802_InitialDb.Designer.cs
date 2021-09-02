@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BreastCancerAPI.Migrations
 {
     [DbContext(typeof(PatientContext))]
-    [Migration("20210902002634_InitialDb")]
+    [Migration("20210902010802_InitialDb")]
     partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -235,7 +235,8 @@ namespace BreastCancerAPI.Migrations
 
                     b.HasOne("BreastCancerAPI.Data.Entities.Patient", "Patient")
                         .WithMany("PrognosticInfos")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("CellFeatures");
 
