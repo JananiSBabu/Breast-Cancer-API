@@ -17,15 +17,12 @@ namespace BreastCancerAPI.Controllers
     [ApiController]
     public class PrognosticInfosForPatientController : ControllerBase
     {
-        private readonly PatientContext _context; // Delete Later
         private IPatientRepository _repository;
         private IMapper _mapper;
         private LinkGenerator _linkGenerator;
 
-        public PrognosticInfosForPatientController(PatientContext context,
-            IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public PrognosticInfosForPatientController(IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
-            _context = context;
             _repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
@@ -68,38 +65,48 @@ namespace BreastCancerAPI.Controllers
         // PUT: api/PrognosticInfos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> PutPrognosticInfoModel(int patientid, int id, PrognosticInfoModel prognosticInfoModel)
+        public async Task<IActionResult> PutPrognosticInfo(int patientid, int id, PrognosticInfoModel prognosticInfoModel)
         {
             if (id != prognosticInfoModel.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(prognosticInfoModel).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PrognosticInfoModelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                var oldPrognosticInfo = await _repository.GetPrognosticInfoByPatientIdAsync(patientid, id, true);
+                if (oldPrognosticInfo == null) return NotFound("Prognostic Info could not be found");
 
-            return NoContent();
+                //B usecase: if cellFeatures is present in request, then overwrite PrognosticInfo.cellFeatures manually
+                // BEFORE using mapper. (mapper designed to prevent accidental overwrites)
+                if (prognosticInfoModel.CellFeatures != null)
+                {
+                    var cellFeatures = await _repository.GetCellFeatureAsync(prognosticInfoModel.CellFeatures.Id);
+                    if (cellFeatures != null)
+                    {
+                        oldPrognosticInfo.CellFeatures = cellFeatures;
+                    }
+                }
+
+                // Map changes from new model to the oldPrognosticInfo
+                _mapper.Map(prognosticInfoModel, oldPrognosticInfo);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok(_mapper.Map<PrognosticInfoModel>(oldPrognosticInfo));
+                }
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
+            return BadRequest("Failed to save changes: Talk");
         }
 
         // POST: api/patients/1/prognosticinfosforpatient/
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PrognosticInfoModel>> PostPrognosticInfoModel(int patientid,
+        public async Task<ActionResult<PrognosticInfoModel>> PostPrognosticInfo(int patientid,
                                                                                      PrognosticInfoModel prognosticInfoModel)
         {
             try
@@ -151,7 +158,7 @@ namespace BreastCancerAPI.Controllers
 
         // DELETE: api/patients/1/prognosticinfosforpatient/200
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeletePrognosticInfoModel(int patientid, int id)
+        public async Task<IActionResult> DeletePrognosticInfo(int patientid, int id)
         {
             try
             {
@@ -178,9 +185,5 @@ namespace BreastCancerAPI.Controllers
             return BadRequest();
         }
 
-        private bool PrognosticInfoModelExists(int id)
-        {
-            return _context.PrognosticInfoModel.Any(e => e.Id == id);
-        }
     }
 }
