@@ -17,13 +17,11 @@ namespace BreastCancerAPI.Controllers
     [ApiController]
     public class PatientsController : ControllerBase
     {
-        private PatientContext _context; // To be deleted
         private IPatientRepository _repository;
         private IMapper _mapper;
         private LinkGenerator _linkGenerator;
 
-        public PatientsController(PatientContext context,
-            IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public PatientsController(IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _repository = repository;
             _mapper = mapper;
@@ -51,7 +49,7 @@ namespace BreastCancerAPI.Controllers
             }
         }
 
-        // GET: api/Patients/5
+        // GET: api/Patients/199
         [HttpGet("{id}")]
         public async Task<ActionResult<PatientModel>> GetPatient(int id, bool includePrognosticInfos = false)
         {
@@ -78,35 +76,42 @@ namespace BreastCancerAPI.Controllers
             }
         }
 
-        // PUT: api/Patients/10001
+        // PUT: api/Patients/199
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{mrn}")]
-        public async Task<IActionResult> PutPatient(int id, PatientModel patientModel)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<PatientModel>> PutPatient(int id, PatientModel patientModel)
         {
             if (id != patientModel.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(patientModel).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                // fetch the old entity
+                var oldPatient = await _repository.GetPatientByIdAsync(id);
+
+                if (oldPatient == null)
+                {
+                    return BadRequest($"Requested patient to be updated {id}, does not exist");
+                }
+
+                // Use automapper to update oldPatient with new data from patientModel
+                _mapper.Map(patientModel, oldPatient); // source, dest
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    // create a new model from updated entity and return
+                    return _mapper.Map<PatientModel>(oldPatient);
+                }
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!PatientExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
 
-            return NoContent();
+            // If Save changes failed
+            return BadRequest();
         }
 
         // POST: api/Patients
@@ -155,7 +160,7 @@ namespace BreastCancerAPI.Controllers
             return BadRequest();
         }
 
-        // DELETE: api/Patients/10001
+        // DELETE: api/Patients/199
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePatient(int id)
         {
@@ -184,9 +189,5 @@ namespace BreastCancerAPI.Controllers
             return BadRequest();
         }
 
-        private bool PatientExists(int id)
-        {
-            return _context.PatientModel.Any(e => e.Id == id);
-        }
     }
 }

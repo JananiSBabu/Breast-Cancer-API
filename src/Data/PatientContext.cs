@@ -49,5 +49,8 @@ namespace BreastCancerAPI.Data
 
         // Add initial data(seeding) to the database
         public DbSet<BreastCancerAPI.Models.PatientModel> PatientModel { get; set; }
+
+        // Add initial data(seeding) to the database
+        public DbSet<BreastCancerAPI.Models.PrognosticInfoModel> PrognosticInfoModel { get; set; }
     }
 }
