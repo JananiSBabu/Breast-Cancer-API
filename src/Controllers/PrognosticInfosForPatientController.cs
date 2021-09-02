@@ -12,16 +12,16 @@ using Microsoft.AspNetCore.Routing;
 
 namespace BreastCancerAPI.Controllers
 {
-    [Route("api/patients/{patientid}/prognosticinfo")]
+    [Route("api/patients/{patientid}/prognosticinfosforpatient")]
     [ApiController]
-    public class PrognosticInfosController : ControllerBase
+    public class PrognosticInfosForPatientController : ControllerBase
     {
         private readonly PatientContext _context; // Delete Later
         private IPatientRepository _repository;
         private IMapper _mapper;
         private LinkGenerator _linkGenerator;
 
-        public PrognosticInfosController(PatientContext context,
+        public PrognosticInfosForPatientController(PatientContext context,
             IPatientRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _context = context;
@@ -32,23 +32,36 @@ namespace BreastCancerAPI.Controllers
 
         // GET: api/PrognosticInfos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PrognosticInfoModel>>> GetPrognosticInfoModel(int patientid)
+        public async Task<ActionResult<IEnumerable<PrognosticInfoModel>>> GetAllPrognosticInfoByPatientId(int patientid, bool includeCellFeatures = false)
         {
-            return await _context.PrognosticInfoModel.ToListAsync();
+            try
+            {
+                //includeSpeakers = true to display them by default
+                var prognosticInfos = await _repository.GetAllPrognosticInfoByPatientIdAsync(patientid, includeCellFeatures);
+
+                return _mapper.Map<PrognosticInfoModel[]>(prognosticInfos);
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
         }
 
         // GET: api/PrognosticInfos/5
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<PrognosticInfoModel>> GetPrognosticInfoModel(int patientid, int id)
+        public async Task<ActionResult<PrognosticInfoModel>> GetPrognosticInfoByPatientId(int patientid, int id, bool includeCellFeatures = false)
         {
-            var prognosticInfoModel = await _context.PrognosticInfoModel.FindAsync(id);
-
-            if (prognosticInfoModel == null)
+            try
             {
-                return NotFound();
-            }
+                //includeSpeakers = true to display them by default
+                var prognosticInfos = await _repository.GetPrognosticInfoByPatientIdAsync(patientid, id, includeCellFeatures);
 
-            return prognosticInfoModel;
+                return _mapper.Map<PrognosticInfoModel>(prognosticInfos);
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
         }
 
         // PUT: api/PrognosticInfos/5

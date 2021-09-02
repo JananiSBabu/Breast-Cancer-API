@@ -102,25 +102,85 @@ namespace BreastCancerAPI.Data
         #endregion
 
         #region PrognosticInfos
-
-        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoAsync()
+        public async Task<PrognosticInfo[]> GetAllPrognosticInfoAsync(bool includeCellFeatures = false)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Getting all PrognosticInfos");
+
+            IQueryable<PrognosticInfo> query = _ctx.PrognosticInfos;
+
+            if (includeCellFeatures)
+            {
+                query = query
+                  .Include(t => t.CellFeatures);
+            }
+
+            // Order It
+            query = query.OrderByDescending(c => c.Outcome);
+
+            return await query.ToArrayAsync();
         }
 
-        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoByOutcome(string category)
+        public async Task<PrognosticInfo[]> GetAllPrognosticInfoByOutcomeAsync(string outcome, bool includeCellFeatures = false)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Getting all PrognosticInfos");
+
+            IQueryable<PrognosticInfo> query = _ctx.PrognosticInfos;
+
+            if (includeCellFeatures)
+            {
+                query = query
+                  .Include(t => t.CellFeatures);
+            }
+
+            // Order It
+            query = query.Where(c => c.Outcome == outcome);
+
+            return await query.ToArrayAsync();
         }
 
-        Task<PrognosticInfo[]> IPatientRepository.GetAllPrognosticInfoByPatientId(int patient)
+        public async Task<PrognosticInfo[]> GetAllPrognosticInfoByPatientIdAsync(int patientId, bool includeCellFeatures = false)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Getting all PrognosticInfos for patientId {patientId}");
+
+            IQueryable<PrognosticInfo> query = _ctx.PrognosticInfos;
+
+            if (includeCellFeatures)
+            {
+                query = query
+                  .Include(t => t.CellFeatures);
+            }
+
+            // Add query
+            query = query
+                    .Where(t => t.Patient.Id == patientId)
+                    .OrderByDescending(c => c.Outcome);
+
+            return await query.ToArrayAsync();            
         }
+
+        public async Task<PrognosticInfo> GetPrognosticInfoByPatientIdAsync(int patientId, int id, bool includeCellFeatures = false)
+        {
+            _logger.LogInformation($"Getting PrognosticInfos {id} for patientId {patientId}");
+
+            IQueryable<PrognosticInfo> query = _ctx.PrognosticInfos;
+
+            if (includeCellFeatures)
+            {
+                query = query
+                  .Include(t => t.CellFeatures);
+            }
+
+            // Add query
+            query = query
+                    .Where(t => t.Id == id && t.Patient.Id == patientId);
+
+            return await query.FirstOrDefaultAsync();
+        }
+
         #endregion
 
         #region CellularFeatures
-        Task<CellFeatures[]> IPatientRepository.GetAllCellFeaturesAsync()
+        public async Task<CellFeatures[]> GetAllCellFeaturesAsync()
         {
             throw new NotImplementedException();
         }
