@@ -180,9 +180,14 @@ namespace BreastCancerAPI.Data
         #endregion
 
         #region CellularFeatures
-        public async Task<CellFeatures[]> GetAllCellFeaturesAsync()
+        public async Task<CellFeatures> GetCellFeatureAsync(int id)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation($"Getting Cell Features");
+
+            var query = _ctx.CellFeatures
+              .Where(t => t.Id == id);
+
+            return await query.FirstOrDefaultAsync();
         }
         #endregion
 

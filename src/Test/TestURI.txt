@@ -24,3 +24,34 @@ get: http://localhost:45178/api/patients/199/?includePrognosticInfos=true
 DELETE:
 
 http://localhost:45178/api/patients/16/
+
+prognosticInfos
+
+
+
+
+post:
+ http://localhost:45178/api/patients/1/prognosticinfosforpatient/
+ 
+{
+    "outcome": "N",
+    "time": 65,
+    "tumorSize": 1.0,
+    "lymphNodeStatus": 0,
+    "cellFeatures": {
+        "Id": 199,
+        "radius": 20.44,
+        "texture": 21.78,
+        "perimeter": 133.8,
+        "area": 1293.0,
+        "smoothness": 0.0915,
+        "compactness": 0.1131,
+        "concavity": 0.09799,
+        "concavePoints": 0.07785,
+        "symmetry": 0.1618,
+        "fractalDimension": 0.05557
+    }
+}
+
+http://localhost:45178/api/patients/1/prognosticinfosforpatient?includeCellFeatures=true
+

@@ -24,7 +24,7 @@ namespace BreastCancerAPI.Data
         
 
         // CellFeatures
-        Task<CellFeatures[]> GetAllCellFeaturesAsync();
+        Task<CellFeatures> GetCellFeatureAsync(int id);
 
     }
 }

@@ -121,7 +121,7 @@ namespace BreastCancerAPI.Controllers
         {
             // In Post, get input as PatientModel and save it as "Patient".[Reverse of Get]
 
-            // Validate the uniqueness of the moniker
+            // Validate the uniqueness of the patient Id
             var existing = await _repository.GetPatientByIdAsync(patientModel.Id, includePrognosticInfos);
             if (existing != null)
             {
@@ -137,7 +137,7 @@ namespace BreastCancerAPI.Controllers
                 if (string.IsNullOrWhiteSpace(location))
                 {
                     //// Hardcoding the string of URI - susceptible to change 
-                    location = $"/api/camps/{patientModel.Id}";
+                    location = $"/api/patients/{patientModel.Id}";
                 }
 
                 // Create entity from Model
@@ -147,7 +147,7 @@ namespace BreastCancerAPI.Controllers
 
                 if (await _repository.SaveChangesAsync())
                 {
-                    //return the URI and the created object (map back to campModel)
+                    //return the URI and the created object (map back to patientModel)
                     return Created(location, _mapper.Map<PatientModel>(patient));
                 }
             }

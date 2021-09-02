@@ -9,6 +9,7 @@ using BreastCancerAPI.Data;
 using BreastCancerAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Routing;
+using BreastCancerAPI.Data.Entities;
 
 namespace BreastCancerAPI.Controllers
 {
@@ -30,13 +31,13 @@ namespace BreastCancerAPI.Controllers
             _linkGenerator = linkGenerator;
         }
 
-        // GET: api/PrognosticInfos
+        // GET: api/patients/1/prognosticinfosforpatient/?includeCellFeatures=true
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PrognosticInfoModel>>> GetAllPrognosticInfoByPatientId(int patientid, bool includeCellFeatures = false)
         {
             try
             {
-                //includeSpeakers = true to display them by default
+                //includeCellFeatures = true to display them by default
                 var prognosticInfos = await _repository.GetAllPrognosticInfoByPatientIdAsync(patientid, includeCellFeatures);
 
                 return _mapper.Map<PrognosticInfoModel[]>(prognosticInfos);
@@ -47,13 +48,13 @@ namespace BreastCancerAPI.Controllers
             }
         }
 
-        // GET: api/PrognosticInfos/5
+        // GET: api/patients/1/prognosticinfosforpatient/200/?includeCellFeatures=true
         [HttpGet("{id:int}")]
         public async Task<ActionResult<PrognosticInfoModel>> GetPrognosticInfoByPatientId(int patientid, int id, bool includeCellFeatures = false)
         {
             try
             {
-                //includeSpeakers = true to display them by default
+                //includeCellFeatures = true to display them by default
                 var prognosticInfos = await _repository.GetPrognosticInfoByPatientIdAsync(patientid, id, includeCellFeatures);
 
                 return _mapper.Map<PrognosticInfoModel>(prognosticInfos);
@@ -95,31 +96,86 @@ namespace BreastCancerAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/PrognosticInfos
+        // POST: api/patients/1/prognosticinfosforpatient/
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PrognosticInfoModel>> PostPrognosticInfoModel(int patientid, PrognosticInfoModel prognosticInfoModel)
+        public async Task<ActionResult<PrognosticInfoModel>> PostPrognosticInfoModel(int patientid,
+                                                                                     PrognosticInfoModel prognosticInfoModel)
         {
-            _context.PrognosticInfoModel.Add(prognosticInfoModel);
-            await _context.SaveChangesAsync();
+            try
+            {              
+                // Validate if a Patient exists
+                var patient = await _repository.GetPatientByIdAsync(patientid);
+                if (patient == null)
+                {
+                    return BadRequest("Patient corresponding to PrognosticInfo does not exists");
+                }
 
-            return CreatedAtAction("GetPrognosticInfoModel", new { id = prognosticInfoModel.Id }, prognosticInfoModel);
+                // Create entity from Model
+                PrognosticInfo prognosticInfo = _mapper.Map<PrognosticInfo>(prognosticInfoModel);
+
+                // Foreign key: Attach Patient to PrognosticInfo before addding to repository
+                prognosticInfo.Patient = patient;
+
+                // Add the requested CellFeatures to PrognosticInfo
+                if (prognosticInfoModel.CellFeatures == null) return BadRequest("Cell features is required");
+                var cellFeatures = await _repository.GetCellFeatureAsync(prognosticInfoModel.CellFeatures.Id);
+                if (cellFeatures == null) return BadRequest("cellFeatures information could not be found");
+                prognosticInfo.CellFeatures = cellFeatures;
+
+                _repository.Add(prognosticInfo);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    // Create the URI to be returned using linkgenerator
+                    var location = _linkGenerator.GetPathByAction(HttpContext, "Get",
+                                                                   values: new { patientid, id = prognosticInfoModel.Id });
+
+                    if (string.IsNullOrWhiteSpace(location))
+                    {
+                        //// Hardcoding the string of URI - susceptible to change 
+                        location = $"api/patients/{patientid}/prognosticinfosforpatient/{prognosticInfoModel.Id}";
+                    }
+                    //return the URI and the created object (map back to PrognosticInfoModel)
+                    return Created(location, _mapper.Map<PrognosticInfoModel>(prognosticInfo));
+                }
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
+
+            // If Save changes failed
+            return BadRequest();
         }
 
-        // DELETE: api/PrognosticInfos/5
+        // DELETE: api/patients/1/prognosticinfosforpatient/200
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeletePrognosticInfoModel(int patientid, int id)
         {
-            var prognosticInfoModel = await _context.PrognosticInfoModel.FindAsync(id);
-            if (prognosticInfoModel == null)
+            try
             {
-                return NotFound();
+                var prognosticInfo = await _repository.GetPrognosticInfoByPatientIdAsync(patientid, id);
+                if (prognosticInfo == null)
+                {
+                    return NotFound();
+                }
+
+                // Delete the entity if found
+                _repository.Delete(prognosticInfo);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
             }
 
-            _context.PrognosticInfoModel.Remove(prognosticInfoModel);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            // If Save changes failed
+            return BadRequest();
         }
 
         private bool PrognosticInfoModelExists(int id)
