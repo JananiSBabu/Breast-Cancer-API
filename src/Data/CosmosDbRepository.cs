@@ -1,8 +1,11 @@
 ﻿using BreastCancer.Infrastructure.Configuration;
+using BreastCancerAPI.Data.Entities;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BreastCancerAPI.Data
 {
@@ -29,9 +32,24 @@ namespace BreastCancerAPI.Data
             return container;
         }
 
-        Task<T> IDataRepository<T>.AddAsync(T newEntity)
+        public async Task<T> AddAsync(T newEntity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Container container = GetContainer();
+                ItemResponse<T> createResponse = await container.CreateItemAsync(newEntity);
+                //return createResponse.Value;
+                return null;
+            }
+            catch (CosmosException ex)
+            {
+                //if (ex.Status != (int)HttpStatusCode.NotFound)
+                //{
+                //    throw;
+                //}
+
+                return null;
+            }
         }
 
         Task<T> IDataRepository<T>.GetAsync(string entityId)

@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BreastCancerAPI.Data.Entities
 {
     public class ClinicalInfo : BaseEntity
     {
-        public int Id { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
 
         // Laterality = left, right, Bilateral, Unilateral
         public string SideOfTumor { get; set; }
@@ -16,7 +19,9 @@ namespace BreastCancerAPI.Data.Entities
         public string SurvivalStatus { get; set; }
         public double BMI { get; set; }
         // mammography, ultrasound, biopsy, MRI
-        public string MethodOfDiagnosis { get; set; }         
+        public string MethodOfDiagnosis { get; set; }
+        
+        [JsonProperty("BreastCancerType")]
         public string BreastCancerType { get; set; }
         public int DateOfFirstDiagnosis { get; set; }
         public bool ReceivedSurgery { get; set; }

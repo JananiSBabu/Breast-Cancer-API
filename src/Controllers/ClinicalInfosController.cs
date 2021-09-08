@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BreastCancerAPI.Data;
+using BreastCancerAPI.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +10,19 @@ using System.Threading.Tasks;
 
 namespace BreastCancerAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/patients/{patientid}/ClinicalInfos")]
     [ApiController]
     public class ClinicalInfosController : ControllerBase
     {
+        private readonly IClinicalInfoRepository _clinicalInfoRepository;
+        //private readonly IDataRepository<ClinicalInfo> _clinicalInfoRepository2;
+
+        public ClinicalInfosController(IClinicalInfoRepository clinicalInfoRepository)
+        {
+            _clinicalInfoRepository = clinicalInfoRepository;
+            //_clinicalInfoRepository2 = clinicalInfoRepository2;
+        }
+
         // GET: api/<ClinicalInfosController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -28,8 +39,16 @@ namespace BreastCancerAPI.Controllers
 
         // POST api/<ClinicalInfosController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<ClinicalInfo>> Post(int patientid, [FromBody] ClinicalInfo entity)
         {
+            if (ModelState.IsValid)
+            {
+                entity.Id = Guid.NewGuid().ToString();
+                await _clinicalInfoRepository.AddAsync(entity);
+                return RedirectToAction("Index");
+            }
+
+            return Ok();
         }
 
         // PUT api/<ClinicalInfosController>/5

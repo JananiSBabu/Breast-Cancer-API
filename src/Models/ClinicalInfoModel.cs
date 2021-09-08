@@ -9,7 +9,7 @@ namespace BreastCancerAPI.Models
     public class ClinicalInfoModel
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         // Laterality = left, right, Bilateral, Unilateral
         public string SideOfTumor { get; set; }

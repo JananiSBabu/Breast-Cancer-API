@@ -50,30 +50,6 @@ namespace BreastCancerAPI.Data
 
             return new ClinicalInfo();
         }
-
-        Task<ClinicalInfo> IDataRepository<ClinicalInfo>.AddAsync(ClinicalInfo newEntity)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task IDataRepository<ClinicalInfo>.DeleteAsync(string entityId)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<ClinicalInfo>> IDataRepository<ClinicalInfo>.GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<ClinicalInfo> IDataRepository<ClinicalInfo>.GetAsync(string entityId)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<ClinicalInfo> IDataRepository<ClinicalInfo>.UpdateAsync(ClinicalInfo entity)
-        {
-            throw new NotImplementedException();
-        }
+                
     }
 }
