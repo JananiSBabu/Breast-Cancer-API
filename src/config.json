@@ -9,5 +9,12 @@
   },
   "ConnectionStrings": {
     "PatientContextDb": "Server=tcp:breastcancerapidbserver.database.windows.net,1433;Initial Catalog=bcapi_db;Persist Security Info=False;User ID=jananibabu;Password=Asdf1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    //"CosmosDB": "AccountEndpoint=https://cosmos-testdb1.documents.azure.com:443/;AccountKey=aPF8moxom6Lo5lvVqmOzfdF59whvCYgm5iKEshNgYv0Vc8u2yazFY5JJIaovwnt6aVPVceaUp6IDI40xbyzD0g==;"
+  },
+  "CosmosDbSettings": {
+    "ConnectionString": "AccountEndpoint=https://cosmos-testdb1.documents.azure.com:443/;AccountKey=aPF8moxom6Lo5lvVqmOzfdF59whvCYgm5iKEshNgYv0Vc8u2yazFY5JJIaovwnt6aVPVceaUp6IDI40xbyzD0g==;",
+    "DatabaseName": "BreastCancerAPI",
+    "ClinicalInfoContainerName": "ClinicalInfo",
+    "ClinicalInfoPartitionKeyPath": "/BreastCancerType"
   }
 }

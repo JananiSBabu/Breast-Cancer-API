@@ -1,8 +1,10 @@
 using BreastCancerAPI.Data;
+using BreastCancerAPI.ServiceCollectionExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +54,14 @@ namespace BreastCancerAPI
                     Version = "1"
                 });
             });
+
+            // cosmos DB - DI config
+            services.AddAppConfiguration(Configuration)
+                    .AddDataServices();
+
+
+            //var docClient = new CosmosClient(Configuration.GetConnectionString("CosmosDB"));
+            //services.AddSingleton<CosmosClient>(docClient);
 
             // API Versioning
             services.AddApiVersioning(opt =>
