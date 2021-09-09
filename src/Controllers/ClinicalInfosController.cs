@@ -1,5 +1,6 @@
 ﻿using BreastCancerAPI.Data;
 using BreastCancerAPI.Data.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,17 +25,37 @@ namespace BreastCancerAPI.Controllers
         }
 
         // GET: api/<ClinicalInfosController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [ProducesResponseType(typeof(IReadOnlyList<ClinicalInfo>), 200)]
+        [HttpGet()]
+        public async Task<IActionResult> GetAllClinicalInfoAsync()
         {
-            return new string[] { "value1", "value2" };
+            var clinicalInfo = await _clinicalInfoRepository.GetAllAsync();
+            return Ok(clinicalInfo);
         }
 
         // GET api/<ClinicalInfosController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<ClinicalInfo>> Get(string id)
         {
-            return "value";
+            
+            try
+            {
+                // results are "entities" themselves -> Patient
+                ClinicalInfo clinicalInfo = await _clinicalInfoRepository.GetAsync(id);
+
+                if (clinicalInfo == null)
+                {
+                    return NotFound();
+                }
+                // Todo: Map entity to model - AM
+
+                return clinicalInfo;
+
+            }
+            catch (Exception e)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database failure");
+            }
         }
 
         // POST api/<ClinicalInfosController>
@@ -44,8 +65,7 @@ namespace BreastCancerAPI.Controllers
             if (ModelState.IsValid)
             {
                 entity.Id = Guid.NewGuid().ToString();
-                await _clinicalInfoRepository.AddAsync(entity);
-                return RedirectToAction("Index");
+                ClinicalInfo clinicalInfo = await _clinicalInfoRepository.AddAsync(entity);
             }
 
             return Ok();

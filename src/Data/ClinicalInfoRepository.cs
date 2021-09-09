@@ -1,6 +1,7 @@
 ﻿using BreastCancer.Infrastructure.Configuration;
 using BreastCancerAPI.Data.Entities;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace BreastCancerAPI.Data
     public class ClinicalInfoRepository : CosmosDbRepository<ClinicalInfo>, IClinicalInfoRepository
     {
         public ClinicalInfoRepository(ICosmosDbConfiguration cosmosDbConfiguration,
-                 CosmosClient client) : base(cosmosDbConfiguration, client)
+                 CosmosClient client, ILogger<CosmosDbRepository<ClinicalInfo>> logger) : base(cosmosDbConfiguration, client, logger)
         {
         }
 

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Cosmos.Linq;
+using Azure;
 
 namespace BreastCancerAPI.Data
 {
@@ -13,17 +16,20 @@ namespace BreastCancerAPI.Data
     {
         protected readonly ICosmosDbConfiguration _cosmosDbConfiguration;
         protected readonly CosmosClient _client;
+        private readonly ILogger<CosmosDbRepository<T>> _logger;
 
         public abstract string ContainerName { get; }
 
         public CosmosDbRepository(ICosmosDbConfiguration cosmosDbConfiguration,
-                           CosmosClient client)
+                           CosmosClient client, ILogger<CosmosDbRepository<T>> logger)
         {
             _cosmosDbConfiguration = cosmosDbConfiguration
                     ?? throw new ArgumentNullException(nameof(cosmosDbConfiguration));
 
             _client = client
                     ?? throw new ArgumentNullException(nameof(client));
+
+            _logger = logger;
         }
         protected Container GetContainer()
         {
@@ -38,23 +44,79 @@ namespace BreastCancerAPI.Data
             {
                 Container container = GetContainer();
                 ItemResponse<T> createResponse = await container.CreateItemAsync(newEntity);
-                //return createResponse.Value;
-                return null;
+                return createResponse.Resource;
             }
             catch (CosmosException ex)
             {
-                //if (ex.Status != (int)HttpStatusCode.NotFound)
-                //{
-                //    throw;
-                //}
-
+                _logger.LogError($"New entity {newEntity.Id} was not added successfully. {ex.Message}");
+                if (ex.StatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
                 return null;
             }
         }
 
-        Task<T> IDataRepository<T>.GetAsync(string entityId)
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                Container container = GetContainer();
+                //AsyncPageable<T> queryResultSetIterator = container.GetItemQueryIterator<T>();
+                List<T> entities = new List<T>();
+                //await foreach (var entity in queryResultSetIterator)
+                //{
+                //    entities.Add(entity);
+                //}
+                //return entities;
+
+                using (var iterator = container.GetItemQueryIterator<T>(
+                                        queryText: $"SELECT * FROM c "))
+                {
+                    while (iterator.HasMoreResults)
+                    {
+                        var response = await iterator.ReadNextAsync();
+
+                        entities.AddRange(response.ToList());
+                    }
+                }
+                return entities;
+            }
+            catch (CosmosException ex)
+            {
+                _logger.LogError($"Entities were not retrieved successfully - error details: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<T> GetAsync(string entityId)
+        {
+            try
+            {
+                Container container = GetContainer();
+                // If partition key is known from request use ReadItemAsync()
+                // ItemResponse<T> entityResult = await container.ReadItemAsync<T>(entityId, new PartitionKey(entityId));
+
+                //If Partition key is not known from request, query using Id 
+                IQueryable<T> queryable = container.GetItemLinqQueryable<T>(true);
+                var iterator = queryable.Where<T>(item => item.Id == entityId).ToFeedIterator();
+                //return await iterator.ReadNextAsync().Result;
+                //Asynchronous query execution
+                while (iterator.HasMoreResults)
+                {
+                    foreach (var item in await iterator.ReadNextAsync())
+                    {
+                        Console.WriteLine(item.Id);
+                        return item;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Entity {entityId} cannot be retrieved successfully. {ex.Message}");
+                return null;
+            }
         }
 
         Task<T> IDataRepository<T>.UpdateAsync(T entity)
@@ -67,32 +129,7 @@ namespace BreastCancerAPI.Data
             throw new NotImplementedException();
         }
 
-        Task<IReadOnlyList<T>> IDataRepository<T>.GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        //public async Task<T> AddAsync(T newEntity)
-        //{
-        //    Container container = GetContainer();
-        //    ItemResponse<T> createResponse = await container.CreateItemAsync(newEntity);
-        //    //try
-        //    //{
-        //    //    Container container = GetContainer();
-        //    //    ItemResponse<T> createResponse = await container.CreateItemAsync(newEntity);
-        //    //    return createResponse.Value;
-        //    //}
-        //    //catch (CosmosException ex)
-        //    //{
-        //    //    //Log.Error($"New entity with ID: {newEntity.Id} was not added successfully - error details: {ex.Message}");
-
-        //    //    //if (ex.Status != (int)HttpStatusCode.NotFound)
-        //    //    //{
-        //    //    //    throw;
-        //    //    //}
-
-        //    //    return null;
-        //    //}
-        //}
     }
 }
