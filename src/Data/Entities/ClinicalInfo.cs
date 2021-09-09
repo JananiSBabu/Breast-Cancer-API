@@ -21,6 +21,7 @@ namespace BreastCancerAPI.Data.Entities
         // mammography, ultrasound, biopsy, MRI
         public string MethodOfDiagnosis { get; set; }
         
+        [JsonRequired]
         [JsonProperty("BreastCancerType")]
         public string BreastCancerType { get; set; }
         public int DateOfFirstDiagnosis { get; set; }
