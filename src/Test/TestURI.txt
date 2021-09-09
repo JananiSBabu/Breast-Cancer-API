@@ -28,7 +28,8 @@ http://localhost:45178/api/patients/16/
 prognosticInfos
 
 
-
+get:
+http://localhost:45178/api/patients/1/prognosticinfosforpatient/9/?includeCellFeatures=true
 
 post:
  http://localhost:45178/api/patients/1/prognosticinfosforpatient/
@@ -55,3 +56,50 @@ post:
 
 http://localhost:45178/api/patients/1/prognosticinfosforpatient?includeCellFeatures=true
 
+
+put:
+
+http://localhost:45178/api/patients/1/prognosticinfosforpatient/9/?includeCellFeatures=true
+
+{
+    "id": 9,
+    "outcome": "R",
+    "time": 70,
+    "tumorSize": 1.0,
+    "lymphNodeStatus": 0,
+    "cellFeatures": {
+        "id": 79,
+        "radius": 20.44,
+        "texture": 21.78,
+        "perimeter": 133.8,
+        "area": 1293.0,
+        "smoothness": 0.0915,
+        "compactness": 0.1131,
+        "concavity": 0.09799,
+        "concavePoints": 0.07785,
+        "symmetry": 0.1618,
+        "fractalDimension": 0.05557
+    }
+}
+
+
+Clinical Info:
+
+POST:
+ http://localhost:45178/api/patients/1/ClinicalInfos/
+{
+    "SideOfTumor": "Left",
+    "HasFamilyHistory": false,
+    "BreastCancerType": "Metastatic"
+}
+ 
+ GET:
+  http://localhost:45178/api/patients/1/ClinicalInfos/
+   http://localhost:45178/api/patients/1/ClinicalInfos/83c86968-3bec-4b53-80f9-9e8d61287470
+ 
+ 
+ 
+ 
+ 
+ 
+ 
