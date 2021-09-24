@@ -1,10 +1,11 @@
 ﻿using BreastCancerAPI.Data.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BreastCancerAPI.Data
 {
     public interface IClinicalInfoRepository : IDataRepository<ClinicalInfo>
     {
-        Task<ClinicalInfo> GetExistingReservationByCarIdAsync(int clinicalInfoId);
+        public Task<IReadOnlyList<ClinicalInfo>> GetExistingReservationByCarIdAsync(string breastCancerType);
     }
 }
